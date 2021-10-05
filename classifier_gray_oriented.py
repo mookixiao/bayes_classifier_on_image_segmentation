@@ -39,21 +39,25 @@ img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 img_gray_masked = img_gray * mask_mat / 255
 img_gray_processed = np.array(img_gray_masked)
 
-# 二分类
-for i in range(img.shape[0]):
-    for j in range(img.shape[1]):
-        if img_gray_masked[i][j] == 0:
-            continue
-        white_val = white_prior * norm.pdf(img_gray_masked[i][j], white_mean, np.sqrt(white_var))
-        red_val = red_prior * norm.pdf(img_gray_masked[i][j], red_mean, np.sqrt(red_var))
-        if white_val > red_val:
-            img_gray_processed[i][j] = 0  # 此处应为1和0，为明显起见，反转两者
-        else:
-            img_gray_processed[i][j] = 1
+def classifier(weight):
+    # 二分类
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            if img_gray_masked[i][j] == 0:
+                continue
+            white_val = white_prior * norm.pdf(img_gray_masked[i][j], white_mean, np.sqrt(white_var))
+            red_val = red_prior * norm.pdf(img_gray_masked[i][j], red_mean, np.sqrt(red_var))
+            if weight * white_val > red_val:
+                img_gray_processed[i][j] = 0  # 此处应为1和0，为明显起见，反转两者
+            else:
+                img_gray_processed[i][j] = 1
 
-cv2.imshow('BGR', img)
-cv2.imshow('gray', img_gray)
-cv2.imshow('gray masked', img_gray_masked)
-cv2.imshow('gray processed', img_gray_processed)
+    cv2.imshow('BGR', img)
+    cv2.imshow('gray', img_gray)
+    cv2.imshow('gray masked', img_gray_masked)
+    cv2.imshow('gray processed, W=' + str(weight), img_gray_processed)
 
-cv2.waitKey()
+if __name__ == '__main__':
+    classifier(weight=0.4)  # 当权重为0.4时效果较好
+
+    cv2.waitKey()

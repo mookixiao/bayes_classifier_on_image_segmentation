@@ -28,8 +28,8 @@ red_prior = len(red_pixes) / len(sample_bgr)
 # 计算均值、方差
 white_means = np.mean(white_pixes, axis=0)
 red_means = np.mean(red_pixes, axis=0)
-white_vars = np.var(white_pixes, axis=0)
-red_vars = np.var(red_pixes, axis=0)
+white_vars = np.cov(white_pixes, rowvar=False)
+red_vars = np.cov(red_pixes, rowvar=False)
 
 # 读入待分类图片
 mask_mat = io.loadmat('Mask.mat')
@@ -40,13 +40,14 @@ img = cv2.imread('imgs/309.bmp')  # 210 * 320 * 3
 img_masked = img * mask_mat / 255
 img_processed = np.zeros([img.shape[0], img.shape[1]])
 
+
 # 二分类
 for i in range(img.shape[0]):
     for j in range(img.shape[1]):
         if img_masked[i][j].sum() == 0:
             continue
-        white_val = white_prior * multivariate_normal.pdf(img_masked[i][j], white_means, np.sqrt(white_vars))
-        red_val = red_prior * multivariate_normal.pdf(img_masked[i][j], red_means, np.sqrt(red_vars))
+        white_val = white_prior * multivariate_normal.pdf(img_masked[i][j], white_means, white_vars)
+        red_val = red_prior * multivariate_normal.pdf(img_masked[i][j], red_means, red_vars)
         if white_val > red_val:
             img_processed[i][j] = 0  # 此处应为1和0，为明显起见，反转两者
         else:
@@ -55,5 +56,3 @@ for i in range(img.shape[0]):
 cv2.imshow('img', img)
 cv2.imshow('img masked', img_masked)
 cv2.imshow('img processed', img_processed)
-
-cv2.waitKey()
