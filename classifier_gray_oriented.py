@@ -23,13 +23,13 @@ red_pixes = np.array(red_pixes)
 
 # 计算先验概率
 white_prior = len(white_pixes) / (len(sample_gray))
-red_prior = len(red_pixes) / len(sample_gray)
+red_prior = 1 - white_prior
 
 # 计算均值、方差
 white_mean = np.mean(white_pixes)
 red_mean = np.mean(red_pixes)
-white_var = np.var(white_pixes)
-red_var = np.var(red_pixes)
+white_std = np.std(white_pixes)
+red_std = np.std(red_pixes)
 
 # 读入待分类图片
 mask_mat = io.loadmat('Mask.mat')
@@ -39,14 +39,15 @@ img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 img_gray_masked = img_gray * mask_mat / 255
 img_gray_processed = np.array(img_gray_masked)
 
+
 def classifier(weight):
     # 二分类
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
             if img_gray_masked[i][j] == 0:
                 continue
-            white_val = white_prior * norm.pdf(img_gray_masked[i][j], white_mean, np.sqrt(white_var))
-            red_val = red_prior * norm.pdf(img_gray_masked[i][j], red_mean, np.sqrt(red_var))
+            white_val = white_prior * norm.pdf(img_gray_masked[i][j], white_mean, white_std)
+            red_val = red_prior * norm.pdf(img_gray_masked[i][j], red_mean, red_std)
             if weight * white_val > red_val:
                 img_gray_processed[i][j] = 0  # 此处应为1和0，为明显起见，反转两者
             else:
@@ -56,6 +57,7 @@ def classifier(weight):
     cv2.imshow('gray', img_gray)
     cv2.imshow('gray masked', img_gray_masked)
     cv2.imshow('gray processed, W=' + str(weight), img_gray_processed)
+
 
 if __name__ == '__main__':
     classifier(weight=0.4)  # 当权重为0.4时效果较好
