@@ -18,8 +18,8 @@ for i in range(len(sample_gray)):
         white_pixes.append(sample_gray[i])
     else:
         red_pixes.append(sample_gray[i])
-white_pixes = np.asarray(white_pixes)
-red_pixes = np.asarray(red_pixes)
+white_pixes = np.array(white_pixes)
+red_pixes = np.array(red_pixes)
 
 # 计算先验概率
 white_prior = len(white_pixes) / (len(sample_gray))
@@ -47,7 +47,7 @@ for i in range(img.shape[0]):
         white_val = white_prior * norm.pdf(img_gray_masked[i][j], white_mean, np.sqrt(white_var))
         red_val = red_prior * norm.pdf(img_gray_masked[i][j], red_mean, np.sqrt(red_var))
         if white_val > red_val:
-            img_gray_processed[i][j] = 0  # 此处应为1和0，为明显期间，反转两者
+            img_gray_processed[i][j] = 0  # 此处应为1和0，为明显起见，反转两者
         else:
             img_gray_processed[i][j] = 1
 
