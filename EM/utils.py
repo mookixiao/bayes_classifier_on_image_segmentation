@@ -11,6 +11,12 @@ def save_gray_img(dir, name, gray_img):
     img = img.convert('RGB')
     img.save(dir + '/' + name)
 
+def save_rgb_img(dir, name, rgb_img):
+    if rgb_img.max() <= 1:
+        rgb_img = (rgb_img * 255).round()
+    img = Image.fromarray(np.uint8(rgb_img))
+    img.save(dir + '/' + name)
+
 
 def save_two_pdf_curves(dir, name, means, stds, labels):
     x = np.arange(0, 1, 1 / 1000)

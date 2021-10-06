@@ -6,7 +6,7 @@ from scipy.stats import norm
 from EM.utils import save_gray_img, save_two_pdf_curves
 
 # 输出文件夹
-dir_out = 'EM_out'
+dir_out = 'EM_gray_out'
 if not os.path.isdir(dir_out):
     os.mkdir(dir_out)
 
