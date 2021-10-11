@@ -1,5 +1,6 @@
 # 基于309.bmp灰度图、RGB图进行处理
 import os
+
 from utils import *
 
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
         os.makedirs(out_dir)
 
     ### 由样本计算假设分布模型的参数
-    gray_arr, rgb_arr, label_arr = get_sample(sample_mat_file, sample_mat_name)
+    gray_arr, rgb_arr, label_arr = get_fish_sample(sample_mat_file, sample_mat_name)
     # 基于灰度图
     white_pixels_gray, red_pixels_gray = get_white_red_pixels(gray_arr, label_arr)
     white_prior, red_prior = get_prior(white_pixels_gray, red_pixels_gray)

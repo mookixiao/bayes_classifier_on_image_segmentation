@@ -3,9 +3,9 @@ import numpy as np
 from scipy import io
 from scipy.stats import norm, multivariate_normal
 
-
-# 读取样本数据
-def get_sample(mat_file, mat_name):
+### task_1-1
+# 读取Nemo鱼样本数据
+def get_fish_sample(mat_file, mat_name):
     mat = io.loadmat(mat_file)
 
     gray_arr = mat[mat_name][:, 0]
@@ -15,7 +15,7 @@ def get_sample(mat_file, mat_name):
     return gray_arr, rgb_arr, label_arr
 
 
-# 分类像素点
+# 分类像素点为白色、红色
 def get_white_red_pixels(pixel_arr, label_arr):
     pixel_lst = pixel_arr.tolist()
     label_lst = label_arr.tolist()
@@ -34,11 +34,11 @@ def get_white_red_pixels(pixel_arr, label_arr):
 
 
 # 计算先验概率
-def get_prior(white_pixels, red_pixels):
-    white_prior = len(white_pixels) / (len(red_pixels))
-    red_prior = 1 - white_prior
+def get_prior(arr_1, arr_2):
+    prior_1 = len(arr_1) / (len(arr_2))
+    prior_2 = 1 - prior_1
 
-    return white_prior, red_prior
+    return prior_1, prior_2
 
 
 # 计算均值、方差
@@ -128,7 +128,80 @@ def img_gray_save(save_dir, prefix, img_name, img_arr):
     img_to_save = save_dir + '/' + prefix + '_' + img_name
     cv2.imwrite(img_to_save, img_arr)
 
+# 保存RGB图
 def img_rgb_save(save_dir, prefix, img_name, img_arr):
     img_to_save = save_dir + '/' + prefix + '_' + img_name
     img_arr = cv2.cvtColor(img_arr.astype(np.float32), cv2.COLOR_RGB2BGR)
     cv2.imwrite(img_to_save, img_arr)
+
+
+### 以下针对task_1-2
+# 读取整张样本数据
+def get_whole_sample(img_file, mat_file, mat_name):
+    img = cv2.imread(img_file)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    mask_mat = io.loadmat(mat_file)[mat_name]
+
+    # 分类像素点
+    fg_pixels = []
+    bg_pixels = []
+    img_lst = img.tolist()
+
+    height, width = img.shape[0], img.shape[1]
+
+    for i in range(height):
+        for j in range(width):
+            if mask_mat[i, j] == 1:
+                fg_pixels.append(img_lst[i][j])
+            else:
+                bg_pixels.append(img_lst[i][j])
+
+    fg_pixels = np.array(fg_pixels)
+    bg_pixels = np.array(bg_pixels)
+
+    return fg_pixels, bg_pixels
+
+# 分类像素点为前景、背景
+def get_fg_rbg_pixels(pixel_arr, label_arr):
+    pixel_lst = pixel_arr.tolist()
+    label_lst = label_arr.tolist()
+
+    white_pixels = []
+    red_pixels = []
+    for i in range(len(pixel_lst)):
+        if label_lst[i] == -1:
+            white_pixels.append(pixel_lst[i])
+        else:
+            red_pixels.append(pixel_lst[i])
+    white_pixels = np.array(white_pixels)
+    red_pixels = np.array(red_pixels)
+
+    return white_pixels, red_pixels
+
+
+# 获取每张图片mask并保存
+def generate_mask(out_dir, img_dir, img_name, height_range, width_range, priors, means, covs, weight):
+    print('GENERATE_MASK: the mask of ' + img_dir + '/' + img_name + ' generating...')
+
+    img = cv2.imread(img_dir + '/' + img_name)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    height, width = img.shape[0], img.shape[1]
+    img_mask = np.zeros((height, width))
+    for i in range(height):
+        for j in range(width):
+            if i > height_range[0] and i < width_range[1] and j > width_range[0] and j < width_range[1]:
+                fg_prob = priors[0] * multivariate_normal.pdf(img[i][j], means[0], covs[0])
+                bg_prob = priors[1] * multivariate_normal.pdf(img[i][j], means[1], covs[1])
+                if weight * fg_prob > bg_prob:
+                    img_mask[i][j] = 1
+
+    # 膨胀、腐蚀操作
+    kernel = np.ones([5, 5])
+    img_raw_mask = cv2.dilate(img_mask, kernel)
+    img_raw_mask = cv2.erode(img_mask, kernel)
+
+    new_mask_file = 'Mask_of_' + img_name.split('.')[:-1] + '.mat'
+    new_mask_name = 'Mask'
+    io.savemat(new_mask_file, {new_mask_name: img_raw_mask})
+    print('GENERATE_MASK: the mask of ' + img_dir + '/' + img_name + ' saved as ' + out_dir + '/' + 'Mask')
