@@ -1,4 +1,4 @@
-# 基于309.bmp灰度图、RGB图进行处理
+# 基于样本数据对309.bmp灰度图、RGB图进行处理
 import os
 
 from utils import *

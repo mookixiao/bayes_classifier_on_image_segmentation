@@ -1,3 +1,4 @@
+# 基于无标签样本数据对309.bmp灰度图进行处理
 import os
 
 from utils import *
