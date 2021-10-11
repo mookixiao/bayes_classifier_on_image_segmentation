@@ -40,15 +40,14 @@ if __name__ == '__main__':
     ### 由样本计算假设分布模型的参数
     gray_arr, rgb_arr, label_arr = get_fish_sample(sample_mat_file, sample_mat_name)
     # 基于灰度图
-    white_pixels_gray, red_pixels_gray = get_white_red_pixels(gray_arr, label_arr)
+    white_pixels_gray, red_pixels_gray = get_two_color_pixels(gray_arr, label_arr)
     white_prior, red_prior = get_prior(white_pixels_gray, red_pixels_gray)
     white_mean_gray, red_mean_gray, white_std_gray, red_std_gray = get_mean_std(white_pixels_gray, red_pixels_gray)
 
     # 处理图片并保存
     for img in imgs_to_process:
-        mask = get_mask(out_dir + '/' + 'Mask_of_' + img, mask_name)
-        img_gray_masked = get_img_gray_masked(img_dir + '/' + img, mask)
-        img_gray_processed = img_gray_segmentation(img_gray_masked, (white_prior, red_prior),
-                                                   (white_mean_gray, red_mean_gray), (white_std_gray, red_std_gray),
-                                                   weight_to_classify_colors)
+        mask = get_mask(out_dir + '/' + 'Mask_of_' + img + '.mat', mask_name)
+        img_gray_processed = segment_img_gray(img_dir + '/' + img, mask, (white_prior, red_prior),
+                                              (white_mean_gray, red_mean_gray), (white_std_gray, red_std_gray),
+                                              weight_to_classify_colors)
         img_gray_save(out_dir, 'basedOnGray', img, img_gray_processed)
