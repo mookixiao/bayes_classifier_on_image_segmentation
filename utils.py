@@ -190,7 +190,7 @@ def generate_mask(out_dir, img_dir, img_name, height_range, width_range, priors,
     img_mask = np.zeros((height, width))
     for i in range(height):
         for j in range(width):
-            if i > height_range[0] and i < width_range[1] and j > width_range[0] and j < width_range[1]:
+            if height_range[0] < i < height_range[1] and width_range[0] < j < width_range[1]:
                 fg_prob = priors[0] * multivariate_normal.pdf(img[i][j], means[0], covs[0])
                 bg_prob = priors[1] * multivariate_normal.pdf(img[i][j], means[1], covs[1])
                 if weight * fg_prob > bg_prob:
@@ -198,10 +198,11 @@ def generate_mask(out_dir, img_dir, img_name, height_range, width_range, priors,
 
     # ÅòÕÍ¡¢¸¯Ê´²Ù×÷
     kernel = np.ones([5, 5])
-    img_raw_mask = cv2.dilate(img_mask, kernel)
-    img_raw_mask = cv2.erode(img_mask, kernel)
+    img_mask = cv2.dilate(img_mask, kernel)
+    img_mask = cv2.erode(img_mask, kernel)
 
-    new_mask_file = 'Mask_of_' + img_name.split('.')[:-1] + '.mat'
-    new_mask_name = 'Mask'
-    io.savemat(new_mask_file, {new_mask_name: img_raw_mask})
-    print('GENERATE_MASK: the mask of ' + img_dir + '/' + img_name + ' saved as ' + out_dir + '/' + 'Mask')
+    mask_file = 'Mask_of_' + img_name + '.mat'
+    mask_name = 'Mask'
+    io.savemat(out_dir + '/' + mask_file, {mask_name: img_mask})
+
+    print('GENERATE_MASK: the mask of ' + img_dir + '/' + img_name + ' saved as ' + out_dir + '/' + mask_file)

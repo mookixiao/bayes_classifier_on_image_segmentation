@@ -16,7 +16,7 @@ mask_name = 'Mask'
 
 weight_gray = 0.2
 weight_rgb = 0.2
-out_dir = 'out/309_Mask'
+out_dir = 'out/task_1-1'
 
 
 if __name__ == '__main__':
