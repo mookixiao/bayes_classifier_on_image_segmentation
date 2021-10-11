@@ -88,7 +88,7 @@ def get_img_rgb_masked(img_name, mask):
 
 
 # 分类灰度图像素点
-def img_gray_segmentation(img_gray, priors, means, stds, weight):
+def img_gray_segmentation(img_gray, priors, means, stds, weight=1):
     height, width = img_gray.shape[0], img_gray.shape[1]
     rtn_img_gray = np.zeros_like(img_gray)
     for i in range(height):
@@ -106,7 +106,7 @@ def img_gray_segmentation(img_gray, priors, means, stds, weight):
 
 
 # 分类RGB图像素点
-def img_rgb_segmentation(img_rgb, priors, means, covs, weight):
+def img_rgb_segmentation(img_rgb, priors, means, covs, weight=1):
     height, width = img_rgb.shape[0], img_rgb.shape[1]
     rtn_img_rgb = np.zeros_like(img_rgb)
     for i in range(height):
@@ -180,7 +180,7 @@ def get_fg_rbg_pixels(pixel_arr, label_arr):
 
 
 # 获取每张图片mask并保存
-def generate_mask(out_dir, img_dir, img_name, height_range, width_range, priors, means, covs, weight):
+def generate_mask(out_dir, img_dir, img_name, height_range, width_range, priors, means, covs, weight=1):
     print('GENERATE_MASK: the mask of ' + img_dir + '/' + img_name + ' generating...')
 
     img = cv2.imread(img_dir + '/' + img_name)

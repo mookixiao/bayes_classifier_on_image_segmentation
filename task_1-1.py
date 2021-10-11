@@ -6,7 +6,7 @@ from utils import *
 
 # 超参数
 img_dir = 'imgs'
-img_name = '309.bmp'
+img_to_process = '309.bmp'
 
 sample_mat_file = 'array_sample.mat'
 sample_mat_name = 'array_sample'
@@ -36,12 +36,12 @@ if __name__ == '__main__':
     ### 处理图片并保存
     mask = get_mask(mask_file, mask_name)
     # 基于灰度图
-    img_gray_masked = get_img_gray_masked(img_dir + '/' + img_name, mask)
+    img_gray_masked = get_img_gray_masked(img_dir + '/' + img_to_process, mask)
     img_gray_processed = img_gray_segmentation(img_gray_masked, (white_prior, red_prior),
                                                (white_mean_gray, red_mean_gray), (white_std_gray, red_std_gray), weight_gray)
-    img_gray_save(out_dir, 'basedOnGray', img_name, img_gray_processed)
+    img_gray_save(out_dir, 'basedOnGray', img_to_process, img_gray_processed)
     # 基于RGB
-    img_rgb_masked = get_img_rgb_masked(img_dir + '/' + img_name, mask)
+    img_rgb_masked = get_img_rgb_masked(img_dir + '/' + img_to_process, mask)
     img_rgb_processed = img_rgb_segmentation(img_rgb_masked, (white_prior, red_prior),
                                              (white_mean_rgb, red_mean_rgb), (white_cov_rgb, red_cov_rgb), weight_rgb)
-    img_rgb_save(out_dir, 'basedOnRGB', img_name, img_rgb_processed)
+    img_rgb_save(out_dir, 'basedOnRGB', img_to_process, img_rgb_processed)
